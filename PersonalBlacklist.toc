@@ -1,0 +1,29 @@
+## Interface: 90005
+## Version: 3.5
+## Title: Personal Black List
+## Author: Alex Ovares (Xylons) & Henry Talavera (Heomel) 
+
+## Notes: Tired of Quiters / Flamers and undesired people that join your Mythic+,Guild o Raid group ?
+## eMail: xylonsUS@gmail.com
+## blacklist:
+## banned: 
+## quiters: 
+## afkers: 
+## mythic+: 
+## raid: 
+## guilds: 
+## PBL:
+## PersonalBlacklist:
+## SavedVariables: PBLDB
+## OptionalDeps: Ace3
+## X-Embeds: Ace3
+
+locales\enUS.lua
+locales\esMX.lua
+locales\esES.lua
+locales\deDE.lua
+
+embeds.xml
+Core.lua
+Config.lua
+Frame.lua
