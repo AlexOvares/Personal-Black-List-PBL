@@ -1,29 +1,27 @@
-## Interface: 90100
-## Version: 3.6
-## Title: Personal Black List
-## Author: Alex Ovares (Xylons) & Henry Talavera (Heomel) 
+## Interface: 90207
+## Version: 3.7
+## Title: Personal Blacklist
+## Notes: Tired of dealing with undesirable players in groups? Blacklist them and forget about them!
 
-## Notes: Tired of Quiters / Flamers and undesired people that join your Mythic+,Guild o Raid group ?
-## eMail: xylonsUS@gmail.com
-## blacklist:
-## banned: 
-## quiters: 
-## afkers: 
-## mythic+: 
-## raid: 
-## guilds: 
-## PBL:
-## PersonalBlacklist:
+## Author: Alex Ovares (Xylons), Henry Talavera (Heomel), Ayr (Proudmoore-US) 
+## X-Email: xylonsUS@gmail.com
+
 ## SavedVariables: PBLDB
 ## OptionalDeps: Ace3
 ## X-Embeds: Ace3
 
+## X-Curse-Project-ID: 304720
+
+# Locale
 locales\enUS.lua
 locales\esMX.lua
 locales\esES.lua
 locales\deDE.lua
 
+# Libraries
 embeds.xml
+
+# Addon Files
 Core.lua
 Config.lua
 Frame.lua
