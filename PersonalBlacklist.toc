@@ -1,5 +1,5 @@
-## Interface: 90005
-## Version: 3.5
+## Interface: 90100
+## Version: 3.6
 ## Title: Personal Black List
 ## Author: Alex Ovares (Xylons) & Henry Talavera (Heomel) 
 

@@ -372,7 +372,7 @@ function PBL:showFrame()
 	end)
 
     local frame = AceGUI:Create("Frame")
-    frame:SetTitle("Personal Black List (PBL) V3.5")
+    frame:SetTitle("Personal Black List (PBL) V3.6")
     frame:SetCallback("OnClose",
         function(widget) 
             AceGUI:Release(widget)
