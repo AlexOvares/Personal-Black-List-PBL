@@ -1,0 +1,6 @@
+package-as: PersonalBlacklist
+
+ignore:
+  - README.md
+  - CONTRIBUTING.md
+  - "*.txt"
