@@ -1,5 +1,9 @@
 # Personal Blacklist (PBL)
 
+[![Discord](https://img.shields.io/discord/1022324287543201824?label=Discord&logo=discord&style=flat)](https://discord.gg/pugCR2Tutr)
+[![Releases](https://img.shields.io/github/v/release/AlexOvares/Personal-Black-List-PBL)]()
+[![Release Date](https://img.shields.io/github/release-date/AlexOvares/Personal-Black-List-PBL)]()
+
 Tired of dealing with undesirable pugs? Have you ever joined a keystone, only to have a DPS leave half-way through the dungeon? Find yourself wishing you could avoid toxic people in battlegrounds? Then this addon is the perfect solution for you!
 
 Personal Blacklist (PBL) is a lightweight addon that gives you the ability to store information about players you no longer wish to play with. In just a few clicks, you can add a player to your blacklist, along with a generic category and the reason you wish to avoid them, and you'll be immediately notified whenever they join a group you're in! Additionally, if a player is on your blacklist, you'll see information about their entry in that player's tooltip.
@@ -52,12 +56,6 @@ To remove a player from your blacklist, you can either:
 - [@Ayr](https://github.com/Scryrz) - Contributor
 - [@Chamilo025](https://www.curseforge.com/members/chamilo025) - Translator
 - [@CheersItsJulian](https://www.curseforge.com/members/cheersitsjulian) - Translator
-
-## Badges
-
-[![Discord](https://img.shields.io/discord/1022324287543201824?label=Discord&logo=discord&style=flat)](https://discord.gg/pugCR2Tutr)
-[![Releases](https://img.shields.io/github/v/release/AlexOvares/Personal-Black-List-PBL)]()
-[![Release Date](https://img.shields.io/github/release-date/AlexOvares/Personal-Black-List-PBL)]()
 
 
 ## Support
