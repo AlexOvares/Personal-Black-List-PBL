@@ -8,3 +8,6 @@ Want to give more context to a blacklisted player? Write a note and explain what
 **General Notes**
 * Code Optimizations
 * Removed class icons as they were offsetting rows and causing spacing issues.
+
+**IMPORTANT NOTE**
+* While this update has been tested with a few users who have preexisting data, and it has worked without issues, I cannot guarantee that every edge case has been covered. **Please back up your existing blacklist (``World of Warcraft\_retail_\WTF\Account\<Your Account>\SavedVariables\PersonalBlacklist.lua``) if you are at all concerned.**
