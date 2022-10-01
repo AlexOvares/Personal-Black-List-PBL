@@ -1,57 +1,81 @@
-# Personal-Black-List-PBL
-Repo for Personal Black List ( PBL ) World of Warcraft Add On
+# Personal Blacklist (PBL)
 
-Tired of getting in groups (Guilds, Raid, Mythics +) with undesirable people on it ? This is the solution!
- 
-The Personal Blacklist or PBL gives you the possibility to store the names of those undesirable players and categorize them.
- 
-How this helps you ? The PBL also gives you the possibility to see on your LFG and Player Tooltips a little warning that they are on your list and not just that also the PBL has an internal functionality that if you get in a group with a player, that's part of your list will show you a Warning mentioning that player and giving you the possibility to leave the group before your activity starts.
- 
-When this Add-on is useful? Literally on any part of the game that includes matching with people that you don't know as Mythics +, Raids, Guilds , World & PvP.
- 
-How to use it ? You can toggle the PBL UI by clicking your new minimap icon or by writing on your chat /pbl , as soon you see your new interface,you just need to insert the name of the person in the current format:  Name-Realm, pick a category ,a reason and a class for your ban and that's it that person now will be included on your Personal Blacklist.
- 
-How to copy a weird name into the PBL ? Right Click the player portrait or chat name and select the option Give PBL Ban or simple toggle your chat and shift+click on the name of the person on the chat and you will get his name and realm on it , simply copy and paste that into your PBL.
-Name Format:  name-realm (Example: Xylons-Illidan)
- 
-List of commands:
+[![Discord](https://img.shields.io/discord/1022324287543201824?label=Discord&logo=discord&style=flat)](https://discord.gg/pugCR2Tutr)
+[![Releases](https://img.shields.io/github/v/release/AlexOvares/Personal-Black-List-PBL)]()
+[![Release Date](https://img.shields.io/github/release-date/AlexOvares/Personal-Black-List-PBL)]()
 
-/pbl (Toggles the PBL UI)
-/pbl config = to open pbl configurations
-/pbl chatfilter = Adds a chat identifier to people that you have on your banned list.
-/pbl alerts = Show / Hide PBL Raid and Party Alerts
-/pbl icon = Show / Hide PBL Minimap Icon
+Tired of dealing with undesirable pugs? Have you ever joined a keystone, only to have a DPS leave half-way through the dungeon? Find yourself wishing you could avoid toxic people in battlegrounds? Then this addon is the perfect solution for you!
 
-This Blacklist record will allow you to always remember the names of those undesirable players.
- 
-Latest Additions:
-v3.4
-- New PBL commands & Functionalities !!!! 
-/pbl config = to open pbl configurations
-/pbl chatfilter (NEW Functionality) = Adds / Remove a chat Msg identifier to people that you have on your banned list when they write on the chat. (Thanks to pantyphoon for this idea)
-/pbl alerts = Show / Hide PBL Raid and Party Alerts
-/pbl icon (NEW Functionality) = Show / Hide PBL Minimap Icon
- 
-- New German Translation ( Big Thanks to SkylineHero for this )
-- Saved Variables Optimization.
- 
-v3.3
-- Fixed issue on target focus.
+Personal Blacklist (PBL) is a lightweight addon that gives you the ability to store information about players you no longer wish to play with. In just a few clicks, you can add a player to your blacklist, along with a generic category and the reason you wish to avoid them, and you'll be immediately notified whenever they join a group you're in! Additionally, if a player is on your blacklist, you'll see information about their entry in that player's tooltip.
 
-- Added functionality to right click chat character name and Add / Remove to PBL.
 
- 
-v3.2
-- On Portrait Right Click - Now it shows the option Give / Remove PBL Ban to add the player selected to your PBL List.
-- New Class Column on the Ban List.
-- New Ban List Color match the selected player class color.
-- New Alert System that notifies via chat once a person is removed or added, besides of that we added the functionality to popup a new alert if a person that's is on your list get's into your group.
-- New Class Icon added and a new feature to remove people from your list way easier via a new button.
-- New Sort Functionality via list header buttons.
- 
-Coming Soon:
-- New Translations and fixes for spanish translation.
-- New Option to edit an existing ban / reasons & category.
-- Ability to back up your Ban List.
- 
-Note: Lists from version 2.2 or behind will not work on v3 and recent versions.
+## Features
+
+- Maintain a blacklist of undesirable players.
+- See information about a blacklisted player in their tooltip(s).
+- **Alert System**: Receive popups when blacklisted players join your groups.
+- **Chat Filter:** Adds prefixes to chat messages from blacklisted players. (Thanks Pantyphoon!)
+
+### Coming Soon
+
+- Edit preexisting blacklist entries.
+- More localization options. Spanish localization fixes.
+- Blacklist backups.
+- Show blacklist information in LFG tooltips.
+
+## Usage
+
+Simply toggle the PBL ui via its minimap button, or type `/pbl` in chat to open the main window.
+
+### Available Chat Commands
+
+- `/pbl` - Toggles the main UI.
+- `/pbl config` - Opens the options panel.
+- `/pbl chatfilter` - Toggles the chat filter.
+- `/pbl alerts` - Toggles visibility of raid and party alerts.
+- `/pbl icon` - Toggles visibility of the minimap icon.
+
+### Adding Players to Blacklist
+
+To add players to your blacklist, you can either:
+
+- Right-click their unitframe and click 'Add/Remove to PBL'
+- Open the PBL window, navigate to the 'Add/Edit' tab, and fill in the required information.
+
+### Removing Blacklist Entries
+To remove a player from your blacklist, you can either:
+
+- Right-click their unitframe and click 'Add/Remove to PBL'
+- Open the PBL window and click the 'X' next to their entry.
+
+
+## Authors
+
+- [@Xylons](https://github.com/AlexOvares/) - Addon Author
+- [@Heomel](https://www.curseforge.com/members/heomel) - Contributor
+- [@Ayr](https://github.com/Scryrz) - Contributor
+- [@Chamilo025](https://www.curseforge.com/members/chamilo025) - Translator
+- [@CheersItsJulian](https://www.curseforge.com/members/cheersitsjulian) - Translator
+
+
+## Support
+
+To report a bug, please open an issue here on Github or report it in our Discord server.
+
+For any other questions or needed support, please join our Discord server!
+
+
+## FAQ
+
+#### I have experience in writing WoW addons and would like to contribute to this project. How can I do so?
+
+Feel free to reach out! If you'd like to clone the repo and then create a pull request, we can also take a look at your code.
+
+#### Can this addon currently blacklist entire servers and/or guilds?
+
+No. Personal Blacklist (PBL) is currently only intended for blacklisting individual characters; however, if there is enough interest, we can look into this for the future.
+
+#### I've found a bug, or am experiencing an issue with the addon. What can I do?
+
+Please feel free to open an issue here on Github for bug reports, or join our Discord server linked above!
+

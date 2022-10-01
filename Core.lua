@@ -4,7 +4,7 @@ local GLDataBroker = LibStub("LibDataBroker-1.1"):NewDataObject("PBL", {
     text = "PBL",
     icon = "Interface\\AddOns\\PersonalBlacklist\\media\\___newIcon.blp",
     OnTooltipShow = function(tooltip)
-          tooltip:SetText("Personal Black List")
+          tooltip:SetText("Personal Blacklist")
           tooltip:AddLine("Ban List", 1, 1, 1)
           tooltip:Show()
      end,
@@ -64,24 +64,34 @@ local defaults = {
             ["count"] = 0,
             ["onparty"] = {},
         },
-        
+
     }
 }
 
-function createBanItem(name,realm,classFile,category,reason)
-    local unitobjtoban ={
+-- TODO: Add 'notes' arg to me!
+
+function createBanItem(name,realm,classFile,category,reason,pnote)
+    local unitobjtoban = {
         name = strupper(name),
         realm = strupper(realm),
         classFile = strupper(classFile),
         catIdx = tonumber(category),
         reaIdx = tonumber(reason),
+        note = ""
     }
+
+    if pnote == "" then
+      unitobjtoban.note = "N/A"
+    else
+      unitobjtoban.note = pnote
+    end
+    
     return unitobjtoban
 end
 
 function PBL:OnInitialize()
     self.db = LibStub("AceDB-3.0"):New("PBLDB", defaults, true)
-    self.optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("PBL", "PBL")        
+    self.optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions("PBL", "PBL")
     icon:Register("PBL", GLDataBroker, self.db.profile.minimap)
     StaticPopupDialogs.CONFIRM_LEAVE_IGNORE = {
         text = "%s",
@@ -90,16 +100,16 @@ function PBL:OnInitialize()
         OnAccept = function() C_PartyInfo.LeaveParty() end,
         whileDead = 1, hideOnEscape = 1, showAlert = 1,
     }
-    
-    if #PBL.db.global.banlist > 0 then        
+
+    if #PBL.db.global.banlist > 0 then
         local index, value
         for index, value in ipairs(PBL.db.global.banlist) do
             local name,_,realm,_,classFile,_,category,_,reason = strsplit("$$",value)
             table.insert(PBL.db.global.blackList, createBanItem(name,realm,classFile,category,reason))
-            
+
         end
         PBL.db.global.banlist = {}
-    end    
+    end
 end
 
 PBL:RegisterChatCommand("pbl", "SlashPBLCommand")
@@ -163,6 +173,16 @@ function has_value (tab, val)
     return false
 end
 
+function getClassIdx(tab, val)
+    local index, value
+    for index, value in ipairs(tab) do
+        if value == val then
+          return index
+        end
+    end
+    return 0
+end
+
 function mysplit (inputstr, sep)
     if sep == nil then
         sep = "%s"
@@ -175,17 +195,26 @@ function mysplit (inputstr, sep)
     return t
 end
 
-function PBL:addtolist(name,realm,classFile,category,reason)
-    local fullname = name.."-"..realm
-    --local unitobjtoban = name.."$$"..realm.."$$"..classFile.."$$"..category.."$$"..reason
-    local unitobjtoban = createBanItem(name,realm,classFile,category,reason)
-    table.insert(PBL.db.global.blackList, unitobjtoban)
-    PBL:Print("|cffff0000"..fullname.." Succesfully added to blacklist!")
-end
-
 function PBL:rmvfromlist(fullname, idx)
     table.remove(PBL.db.global.blackList, idx)
     PBL:Print("|cff008000"..fullname.." Removed from blacklist")
+end
+
+function PBL:addtolist(name,realm,classFile,category,reason,note)
+    local fullname = name.."-"..realm
+    --local unitobjtoban = name.."$$"..realm.."$$"..classFile.."$$"..category.."$$"..reason..note
+    local unitobjtoban = createBanItem(name,realm,classFile,category,reason,note)
+
+    local banned, idx = isbanned(PBL.db.global.blackList, fullname)
+    if banned then
+      -- PBL:rmvfromlist(fullname, idx)
+      -- table.insert(PBL.db.global.blackList, unitobjtoban)
+      PBL.db.global.blackList[idx] = unitobjtoban
+      PBL:Print("|cffff0000"..fullname.."'s entry has been successfully edited!")
+    else
+      table.insert(PBL.db.global.blackList, unitobjtoban)
+      PBL:Print("|cffff0000"..fullname.." succesfully added to blacklist!")
+    end
 end
 
 function PBL:clearlist()
@@ -199,7 +228,8 @@ local function blackListButton(self)
         local unit = dropdownFrame.unit
         local name = dropdownFrame.name
         local server = dropdownFrame.server
-        local className,classFile,classID 
+        local className,classFile,classID
+        local note = "Added from unitframe."
         if unit then
             className,classFile,classID = UnitClass(unit)
         -- elseif self.owner == "FRIEND" then
@@ -225,10 +255,10 @@ local function blackListButton(self)
             if exist then
                 PBL:rmvfromlist(fullname, i)
             else
-                PBL:addtolist(name,server,classFile,1,1)
+                PBL:addtolist(name,server,classFile,1,1,note)
             end
             PBL:refreshWidgetCore()
-        end    
+        end
     end
 end
 
@@ -275,7 +305,7 @@ end
 
 hooksecurefunc("UnitPopup_ShowMenu", Assignfunchook)
 
-
+-- ADD BAN INFORMATION TO TOOLTIP
 GameTooltip:HookScript("OnTooltipSetUnit", function(self)
     local name, unit = self:GetUnit()
     if UnitIsPlayer(unit) and not UnitIsUnit(unit, "player") and not UnitIsUnit(unit, "party") then
@@ -285,8 +315,14 @@ GameTooltip:HookScript("OnTooltipSetUnit", function(self)
             realm=realm:gsub(" ","");
         end
         fullname = name .. "-" .. realm;
-        if isbanned(PBL.db.global.blackList, fullname) then
-            self:AddLine("Blacklisted! (PBL)", 1, 0, 0, true)	
+
+        local banned, idx = isbanned(PBL.db.global.blackList,fullname)
+        local p = PBL.db.global.blackList[idx]
+        if banned then
+            local banStr = PBL.db.profile.categories[tonumber(p.catIdx)] .. " (" .. PBL.db.profile.reasons[tonumber(p.reaIdx)] .. ")" .. " - " .. p.note
+            self:AddLine("Blacklisted (PBL): |cffFFFFFF" .. banStr .. "|r", 1, 0, 0, true)
+            self:AddLine(" ")
+            -- self:AddLine(PBL.db.global.blackList[idx].note, 1, 0, 0, true)
         end
     end
 end)
@@ -297,6 +333,7 @@ local function OnLeaveHook(self)
 		GameTooltip:Hide();
 end
 
+-- ADD BAN TO LFG
 hooksecurefunc("LFGListApplicationViewer_UpdateResults", function(self)
     local buttons = self.ScrollFrame.buttons
     local i, j
@@ -316,8 +353,13 @@ hooksecurefunc("LFGListApplicationViewer_UpdateResults", function(self)
 								realm=realm:gsub(" ","");
 								fullname = name.."-"..realm;
 							end
-							if isbanned(PBL.db.global.blackList, fullname) then			
-								GameTooltip:AddLine("Blacklisted! (PBL)",1,0,0,true);
+
+              local banned, idx = isbanned(PBL.db.global.blackList, fullname)
+              local p = PBL.db.global.blackList[idx]
+							if banned then
+                local banStr = PBL.db.profile.categories[tonumber(p.catIdx)] .. " (" .. PBL.db.profile.reasons[tonumber(p.reaIdx)] .. ")" .. " - " .. p.note
+                GameTooltip:AddLine("\nBlacklisted (PBL): |cffFFFFFF" .. banStr .. "|r", 1, 0, 0, true)
+                GameTooltip:AddLine(" ")
 								GameTooltip:Show();
 							end
 						end)
@@ -352,7 +394,7 @@ function PBL:gru_eventhandler()
                 if fullname ~= nil or fullname ~= "" then
                     local exist, i = isbanned(PBL.db.global.blackList, fullname)
                     if exist == true then
-                        table.insert(self.db.profile.ShowAlert["onparty"], fullname)               
+                        table.insert(self.db.profile.ShowAlert["onparty"], fullname)
                     end
                 end
             end
@@ -375,25 +417,25 @@ function PBL:gru_eventhandler()
         end
         if name then
             if (not realm) or (realm == " ") or (realm == "") then realm = GetRealmName(); realm=realm:gsub(" ",""); end
-            local fullname = name.."-"..realm            
+            local fullname = name.."-"..realm
             if fullname ~= nil or fullname ~= "" then
                 local exist, i = isbanned(PBL.db.global.blackList, fullname)
                 local exist2, j = has_value(PBL.db.profile.ShowAlert["onparty"], fullname)
                 if exist == true then
                     if exist2 == false then
                         PBL:Print("|cffff0000".."Here is",fullname,"who is in your BlackList")
-                        table.insert(self.db.profile.ShowAlert["onparty"], fullname)  
+                        table.insert(self.db.profile.ShowAlert["onparty"], fullname)
                         aux = true
                     end
                     pjs[table.getn(pjs) + 1] = fullname
-                    self.db.profile.ShowAlert["count"] = latestGroupMembers                 
+                    self.db.profile.ShowAlert["count"] = latestGroupMembers
                 end
             end
         end
     end
 
     if self.db.profile.ShowAlert["LeaveAlert"] == false and aux == true then
-        if table.getn(pjs) ~= 0 then          
+        if table.getn(pjs) ~= 0 then
             local text = "", j
             for j=1, table.getn(pjs) do
                 text = text..pjs[j].."\n"
@@ -413,7 +455,7 @@ PBL:RegisterEvent("GROUP_ROSTER_UPDATE", "gru_eventhandler")
 local function myChatFilter(self, event, msg, author, ...)
     if PBL.db.profile.chatfilter.disabled then
         return false
-    end 
+    end
     local category = ""
     local exist, i = isbanned(PBL.db.global.blackList, author)
     if exist then
@@ -430,7 +472,7 @@ local function myChatFilter(self, event, msg, author, ...)
     end
     return false
  end
- 
+
  ChatFrame_AddMessageEventFilter("CHAT_MSG_CHANNEL", myChatFilter)
  ChatFrame_AddMessageEventFilter("CHAT_MSG_SAY", myChatFilter)
  ChatFrame_AddMessageEventFilter("CHAT_MSG_YELL", myChatFilter)
