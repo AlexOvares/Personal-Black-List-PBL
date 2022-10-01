@@ -1,4 +1,4 @@
-# v3.7 Changelong
+# v3.7 Changelog
 **New Feature: Editing**
 * You are now able to edit everything about preexisting entries. Click on an entry to test it out!
 
