@@ -4,3 +4,7 @@ ignore:
   - README.md
   - CONTRIBUTING.md
   - "*.txt"
+
+manual-changelog:
+  filename: CHANGELOG.md
+  markup-type: markdown
