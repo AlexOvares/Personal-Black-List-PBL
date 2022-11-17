@@ -15,14 +15,14 @@
 ## X-Curse-Project-ID: 304720
 ## X-WoWI-ID: 24841
 
+# Libraries
+embeds.xml
+
 # Locale
 locales\enUS.lua
 locales\esMX.lua
 locales\esES.lua
 locales\deDE.lua
-
-# Libraries
-embeds.xml
 
 # Addon Files
 Core.lua
