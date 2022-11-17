@@ -502,6 +502,16 @@ TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, OnTooltipSetU
 -- 	end
 -- end)
 
+-- Pseudocode for Temp. Fix:
+-- Hook into LFG_LIST_APPLICANT_LIST_UPDATED
+-- If LFG_LIST_APPLICANT_LIST_UPDATED == true, true:
+--     LFG_LIST_APPLICANT_UPDATED returns new applicantID
+--     C_LFGList.GetApplicantInfo(applicantID) returns table {applicantID, pendingApplicationStatus, numMembers, isNew, ...}
+--        isNew returns true if applicant has not applied to the group before.
+--     C_LFGList.GetApplicants() returns a table of applicantID. Can get memberIndex from this.
+--        Grab table. Get index where table[applicantID] = applicantID (from LFG_LIST_APPLICANT_UPDATED or GetApplicantInfo())
+--     C_LFGList.GetApplicantMemberInfo(applicantID, memberIndex) returns table {name, class, ...}
+
 -- --------------------------------------------------------------------------
 -- Event Handler - Group Join/Leave
 -- --------------------------------------------------------------------------
