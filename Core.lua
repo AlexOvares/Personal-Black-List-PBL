@@ -68,7 +68,13 @@ local defaults = {
     }
 }
 
--- TODO: Add 'notes' arg to me!
+-- --------------------------------------------------------------------------
+-- Create Ban Item
+-- --------------------------------------------------------------------------
+-- Create item to add to blacklist.
+-- TODO: Refactor to potentially use a class instead of a table.
+--       Potentially move to Utils.lua
+-- --------------------------------------------------------------------------
 
 function createBanItem(name,realm,classFile,category,reason,pnote)
     local unitobjtoban = {
@@ -88,6 +94,12 @@ function createBanItem(name,realm,classFile,category,reason,pnote)
     
     return unitobjtoban
 end
+
+-- --------------------------------------------------------------------------
+-- General Addon Structure
+-- --------------------------------------------------------------------------
+-- OnInitialize, etc.
+-- --------------------------------------------------------------------------
 
 function PBL:OnInitialize()
     self.db = LibStub("AceDB-3.0"):New("PBLDB", defaults, true)
@@ -112,9 +124,17 @@ function PBL:OnInitialize()
     end
 end
 
+-- --------------------------------------------------------------------------
+-- Chat Commands
+-- --------------------------------------------------------------------------
+-- Insert blacklist information into unit tooltips.
+-- TODO: Refactor and potentially move to its own Options.lua module.
+--       Rename ChatFilter to "ChatPrefix" or something more fitting.
+-- --------------------------------------------------------------------------
+
 PBL:RegisterChatCommand("pbl", "SlashPBLCommand")
 
-
+-- Opens the main PBL frame.
 function PBL:SlashPBLCommand(input)
     if not input or input:trim() == "" then
         --InterfaceOptionsFrame_OpenToCategory(self.optionsFrame)
@@ -126,6 +146,7 @@ function PBL:SlashPBLCommand(input)
     end
 end
 
+-- Toggles the minimap icon.
 function PBL:CommandIcon()
     self.db.profile.minimap.hide = not self.db.profile.minimap.hide
     if self.db.profile.minimap.hide then
@@ -135,6 +156,7 @@ function PBL:CommandIcon()
     end
 end
 
+-- Toggles the chat prefix.
 function PBL:CommandChatFilter()
     self.db.profile.chatfilter.disabled = not self.db.profile.chatfilter.disabled
     if self.db.profile.chatfilter.disabled then
@@ -144,6 +166,7 @@ function PBL:CommandChatFilter()
     end
 end
 
+-- Toggles popup alerts.
 function PBL:CommandAlerts()
     self.db.profile.ShowAlert["LeaveAlert"] = not self.db.profile.ShowAlert["LeaveAlert"]
     if self.db.profile.ShowAlert["LeaveAlert"] then
@@ -152,6 +175,14 @@ function PBL:CommandAlerts()
         PBL:Print("Alerts enabled")
     end
 end
+
+-- --------------------------------------------------------------------------
+-- Utils - isbanned
+-- --------------------------------------------------------------------------
+-- Check if a given name exists in the blacklist.
+-- TODO: Potentially move to Utils.lua
+--       Rename to be more fitting - isBlacklisted()
+-- --------------------------------------------------------------------------
 
 function isbanned (tab, val)
     local index, value
@@ -163,6 +194,14 @@ function isbanned (tab, val)
     return false, 0
 end
 
+-- --------------------------------------------------------------------------
+-- Utils - has_value
+-- --------------------------------------------------------------------------
+-- Returns true if a value exists in a table.
+-- TODO: Potentially move to Utils.lua
+--       Rename to be more fitting - hasValue()
+-- --------------------------------------------------------------------------
+
 function has_value (tab, val)
     local index, value
     for index, value in ipairs(tab) do
@@ -173,6 +212,15 @@ function has_value (tab, val)
     return false
 end
 
+-- --------------------------------------------------------------------------
+-- Utils - getClassIdx
+-- --------------------------------------------------------------------------
+-- Returns the class index for storage and reference.
+-- TODO: Potentially move to Utils.lua
+--       Rename to be more fitting - hasValue()
+--       Not necessary? Store global list instead or grab class from unitInfo
+-- --------------------------------------------------------------------------
+
 function getClassIdx(tab, val)
     local index, value
     for index, value in ipairs(tab) do
@@ -182,6 +230,14 @@ function getClassIdx(tab, val)
     end
     return 0
 end
+
+-- --------------------------------------------------------------------------
+-- Utils - has_value
+-- --------------------------------------------------------------------------
+-- Custom string split.
+-- TODO: Potentially move to Utils.lua
+--       Not used anywhere in code. Remove?
+-- --------------------------------------------------------------------------
 
 function mysplit (inputstr, sep)
     if sep == nil then
@@ -195,10 +251,26 @@ function mysplit (inputstr, sep)
     return t
 end
 
+-- --------------------------------------------------------------------------
+-- Utils - rmvfromlist
+-- --------------------------------------------------------------------------
+-- Removes a user from the blacklist.
+-- TODO: Potentially move to Utils.lua
+--       Rename to be more fitting - removeBlacklistEntry() or unblacklistPlayer()
+-- --------------------------------------------------------------------------
+
 function PBL:rmvfromlist(fullname, idx)
     table.remove(PBL.db.global.blackList, idx)
     PBL:Print("|cff008000"..fullname.." Removed from blacklist")
 end
+
+-- --------------------------------------------------------------------------
+-- Utils - addtolist
+-- --------------------------------------------------------------------------
+-- Adds a user to the blacklist.
+-- TODO: Potentially move to Utils.lua
+--       Rename to be more fitting - addBlacklistEntry() or blacklistPlayer()
+-- --------------------------------------------------------------------------
 
 function PBL:addtolist(name,realm,classFile,category,reason,note)
     local fullname = name.."-"..realm
@@ -217,9 +289,27 @@ function PBL:addtolist(name,realm,classFile,category,reason,note)
     end
 end
 
+-- --------------------------------------------------------------------------
+-- Utils - clearlist
+-- --------------------------------------------------------------------------
+-- Completely wipes the blacklist.
+-- TODO: Potentially move to Utils.lua
+--       Rename to be more fitting - wipeBlacklist()
+-- --------------------------------------------------------------------------
+
 function PBL:clearlist()
     PBL.db.global.blackList = {}
 end
+
+-- --------------------------------------------------------------------------
+-- Utils - blackListButton
+-- --------------------------------------------------------------------------
+-- Adds/removes a user from context menus.
+-- TODO: Potentially move to Utils.lua
+--       Rename to be more fitting - blacklistFromContext()
+--       Refactor for optimization.
+--           Potential for taint here - consider another way?
+-- --------------------------------------------------------------------------
 
 local function blackListButton(self)
     local button = self.value;
@@ -305,9 +395,40 @@ end
 
 hooksecurefunc("UnitPopup_ShowMenu", Assignfunchook)
 
--- ADD BAN INFORMATION TO TOOLTIP
-GameTooltip:HookScript("OnTooltipSetUnit", function(self)
-    local name, unit = self:GetUnit()
+-- --------------------------------------------------------------------------
+-- DEPRECATED: Unit Tooltips
+-- --------------------------------------------------------------------------
+-- Insert blacklist information into unit tooltips.
+-- --------------------------------------------------------------------------
+-- GameTooltip:HookScript("OnTooltipSetUnit", function(self)
+--     local name, unit = self:GetUnit()
+--     if UnitIsPlayer(unit) and not UnitIsUnit(unit, "player") and not UnitIsUnit(unit, "party") then
+--         local name, realm = UnitName(unit)
+--         if realm == nil then
+--             realm=GetRealmName()
+--             realm=realm:gsub(" ","");
+--         end
+--         fullname = name .. "-" .. realm;
+
+--         local banned, idx = isbanned(PBL.db.global.blackList,fullname)
+--         local p = PBL.db.global.blackList[idx]
+--         if banned then
+--             local banStr = PBL.db.profile.categories[tonumber(p.catIdx)] .. " (" .. PBL.db.profile.reasons[tonumber(p.reaIdx)] .. ")" .. " - " .. p.note
+--             self:AddLine("Blacklisted (PBL): |cffFFFFFF" .. banStr .. "|r", 1, 0, 0, true)
+--             self:AddLine(" ")
+--             -- self:AddLine(PBL.db.global.blackList[idx].note, 1, 0, 0, true)
+--         end
+--     end
+-- end)
+
+-- --------------------------------------------------------------------------
+-- Unit Tooltips
+-- --------------------------------------------------------------------------
+-- Insert blacklist information into unit tooltips.
+-- TODO: Refactor significantly. This is a temporary implementation to match API changes from 10.0.2.
+-- --------------------------------------------------------------------------
+local function OnTooltipSetUnit(tooltip, data)
+    local name, unit = tooltip:GetUnit()
     if UnitIsPlayer(unit) and not UnitIsUnit(unit, "player") and not UnitIsUnit(unit, "party") then
         local name, realm = UnitName(unit)
         if realm == nil then
@@ -320,58 +441,84 @@ GameTooltip:HookScript("OnTooltipSetUnit", function(self)
         local p = PBL.db.global.blackList[idx]
         if banned then
             local banStr = PBL.db.profile.categories[tonumber(p.catIdx)] .. " (" .. PBL.db.profile.reasons[tonumber(p.reaIdx)] .. ")" .. " - " .. p.note
-            self:AddLine("Blacklisted (PBL): |cffFFFFFF" .. banStr .. "|r", 1, 0, 0, true)
-            self:AddLine(" ")
+            tooltip:AddLine("Blacklisted (PBL): |cffFFFFFF" .. banStr .. "|r", 1, 0, 0, true)
+            tooltip:AddLine(" ")
             -- self:AddLine(PBL.db.global.blackList[idx].note, 1, 0, 0, true)
         end
     end
-end)
-
-local hooked = { }
-
-local function OnLeaveHook(self)
-		GameTooltip:Hide();
 end
 
--- ADD BAN TO LFG
-hooksecurefunc("LFGListApplicationViewer_UpdateResults", function(self)
-    local buttons = self.ScrollFrame.buttons
-    local i, j
-	for i = 1, #buttons do
-		local button = buttons[i]
-		if not hooked[button] then
-			if button.applicantID and button.Members then
-				for j = 1, #button.Members do
-					local b = button.Members[j]
-					if not hooked[b] then
-						hooked[b] = 1
-						b:HookScript("OnEnter", function()
-							local appID = button.applicantID;
-							local name = C_LFGList.GetApplicantMemberInfo(appID, 1);
-							if not string.match(name, "-") then
-								local realm = GetRealmName();
-								realm=realm:gsub(" ","");
-								fullname = name.."-"..realm;
-							end
+TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, OnTooltipSetUnit)
 
-              local banned, idx = isbanned(PBL.db.global.blackList, fullname)
-              local p = PBL.db.global.blackList[idx]
-							if banned then
-                local banStr = PBL.db.profile.categories[tonumber(p.catIdx)] .. " (" .. PBL.db.profile.reasons[tonumber(p.reaIdx)] .. ")" .. " - " .. p.note
-                GameTooltip:AddLine("\nBlacklisted (PBL): |cffFFFFFF" .. banStr .. "|r", 1, 0, 0, true)
-                GameTooltip:AddLine(" ")
-								GameTooltip:Show();
-							end
-						end)
-						b:HookScript("OnLeave", OnLeaveHook)
-					end
-				end
-			end
-		end
-	end
-end)
+-- --------------------------------------------------------------------------
+-- LFG Tooltips
+-- --------------------------------------------------------------------------
+-- Returns true if a value exists in a table.
+-- TODO: Completely broken due to 10.0.0/2 changes.
+--       Find another workaround or fall back to chat notifications instead.
+-- --------------------------------------------------------------------------
 
+-- local hooked = { }
 
+-- local function OnLeaveHook(self)
+-- 		GameTooltip:Hide();
+-- end
+
+-- -- ADD BAN TO LFG
+-- hooksecurefunc("LFGListApplicationViewer_UpdateResults", function(self)
+--     local buttons = self.ScrollFrame.buttons
+--     local i, j
+-- 	for i = 1, #buttons do
+-- 		local button = buttons[i]
+-- 		if not hooked[button] then
+-- 			if button.applicantID and button.Members then
+-- 				for j = 1, #button.Members do
+-- 					local b = button.Members[j]
+-- 					if not hooked[b] then
+-- 						hooked[b] = 1
+-- 						b:HookScript("OnEnter", function()
+-- 							local appID = button.applicantID;
+-- 							local name = C_LFGList.GetApplicantMemberInfo(appID, 1);
+-- 							if not string.match(name, "-") then
+-- 								local realm = GetRealmName();
+-- 								realm=realm:gsub(" ","");
+-- 								fullname = name.."-"..realm;
+-- 							end
+
+--                             local banned, idx = isbanned(PBL.db.global.blackList, fullname)
+--                             local p = PBL.db.global.blackList[idx]
+-- 							if banned then
+--                                 local banStr = PBL.db.profile.categories[tonumber(p.catIdx)] .. " (" .. PBL.db.profile.reasons[tonumber(p.reaIdx)] .. ")" .. " - " .. p.note
+--                                 GameTooltip:AddLine("\nBlacklisted (PBL): |cffFFFFFF" .. banStr .. "|r", 1, 0, 0, true)
+--                                 GameTooltip:AddLine(" ")
+-- 								GameTooltip:Show();
+-- 							end
+-- 						end)
+-- 						b:HookScript("OnLeave", OnLeaveHook)
+-- 					end
+-- 				end
+-- 			end
+-- 		end
+-- 	end
+-- end)
+
+-- Pseudocode for Temp. Fix:
+-- Hook into LFG_LIST_APPLICANT_LIST_UPDATED
+-- If LFG_LIST_APPLICANT_LIST_UPDATED == true, true:
+--     LFG_LIST_APPLICANT_UPDATED returns new applicantID
+--     C_LFGList.GetApplicantInfo(applicantID) returns table {applicantID, pendingApplicationStatus, numMembers, isNew, ...}
+--        isNew returns true if applicant has not applied to the group before.
+--     C_LFGList.GetApplicants() returns a table of applicantID. Can get memberIndex from this.
+--        Grab table. Get index where table[applicantID] = applicantID (from LFG_LIST_APPLICANT_UPDATED or GetApplicantInfo())
+--     C_LFGList.GetApplicantMemberInfo(applicantID, memberIndex) returns table {name, class, ...}
+
+-- --------------------------------------------------------------------------
+-- Event Handler - Group Join/Leave
+-- --------------------------------------------------------------------------
+-- Handles checking for blacklist entries when users join a group.
+-- TODO: Refactor for optimization.
+--       Rename to be more fitting - OnGroupChange() or eh_GroupChange()
+-- --------------------------------------------------------------------------
 
 function PBL:gru_eventhandler()
     local aux = false
@@ -451,6 +598,14 @@ function PBL:gru_eventhandler()
 end
 
 PBL:RegisterEvent("GROUP_ROSTER_UPDATE", "gru_eventhandler")
+
+-- --------------------------------------------------------------------------
+-- Chat Filter
+-- --------------------------------------------------------------------------
+-- Adds a prefix to messages from blacklisted users.
+-- TODO: Potentially move to Modules.lua
+--       Rename to be more fitting - chatPrefix()
+-- --------------------------------------------------------------------------
 
 local function myChatFilter(self, event, msg, author, ...)
     if PBL.db.profile.chatfilter.disabled then

@@ -1,25 +1,28 @@
-## Interface: 90207
-## Version: 3.7
+## Interface: 100002
+## Version: 3.7.5
 ## Title: Personal Blacklist
 ## Notes: Tired of dealing with undesirable players in groups? Blacklist them and forget about them!
 
 ## Author: Alex Ovares (Xylons), Henry Talavera (Heomel), Ayr (Proudmoore-US) 
 ## X-Email: xylonsUS@gmail.com
+## X-Discord: discord.gg/pugCR2Tutr
 
 ## SavedVariables: PBLDB
 ## OptionalDeps: Ace3
 ## X-Embeds: Ace3
 
+#  Package Management ----------
 ## X-Curse-Project-ID: 304720
+## X-WoWI-ID: 24841
+
+# Libraries
+embeds.xml
 
 # Locale
 locales\enUS.lua
 locales\esMX.lua
 locales\esES.lua
 locales\deDE.lua
-
-# Libraries
-embeds.xml
 
 # Addon Files
 Core.lua
