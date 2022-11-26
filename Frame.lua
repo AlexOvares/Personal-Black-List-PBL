@@ -296,7 +296,7 @@ function PBL:showFrame()
             local colorAux = self:setClassColor(v.classFile)
 
             namelist[i] = AceGUI:Create("InteractiveLabel")
-						namelist[i] = PBL:createNameLabel(v, 0.30, colorAux[1], colorAux[2], colorAux[3], tabContainer)
+			namelist[i] = PBL:createNameLabel(v, 0.30, colorAux[1], colorAux[2], colorAux[3], tabContainer)
 
             --if(v.classFile ~="UNSPECIFIED" and v.classFile ~= "" and v.classFile ~= nil) then
             --    namelist[i]:SetImage("Interface\\GLUES\\CHARACTERCREATE\\UI-CHARACTERCREATE-CLASSES",unpack(CLASS_ICON_TCOORDS[v.classFile]))
@@ -559,7 +559,7 @@ end
 
 function PBL:setClassColor(class)
     -- 1-Warrior , 2-Paladin , 3-Hunter , 4-Rogue , 5-Priest , 6-Shaman, 7-Mage, 8-Warlock, 9-Monk, 10-Druid, 11-Demon Hunter, 12- Death Knight
-    local claColor={
+    local classColor={
         ["UNSPECIFIED"]={0.62,0.62,0.62},
         ["WARRIOR"]={0.78,0.61,0.43},
         ["PALADIN"]={0.96,0.55,0.73},
@@ -572,9 +572,10 @@ function PBL:setClassColor(class)
         ["MONK"]={0.00,1.00,0.59},
         ["DRUID"]={1.00,0.49,0.04},
         ["DEMONHUNTER"]={0.64,0.19,0.79},
-        ["DEATHKNIGHT"]={0.77,0.12,0.23}
+        ["DEATHKNIGHT"]={0.77,0.12,0.23},
+        ["EVOKER"]={0.20, 0.58, 0.50},
     }
-    return claColor[class]
+    return classColor[class]
 end
 
 function PBL:getKeysSortedByValue(tbl, sortFunction, value)

@@ -33,7 +33,8 @@ local defaults = {
             "ROGUE",
             "SHAMAN",
             "WARLOCK",
-            "WARRIOR"
+            "WARRIOR",
+            "EVOKER",
         },
         categories={
             L["dropDownAll"],
