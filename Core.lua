@@ -404,37 +404,37 @@ hooksecurefunc("UnitPopup_ShowMenu", Assignfunchook)
 
 -- util for generating blacklisted str in format "Category (Reason) - Note"
 local function getBlacklistedStr(p)
-    local category = PBL.db.profile.categories[tonumber(p.catIdx)]
-    local reason = PBL.db.profile.reasons[tonumber(p.reaIdx)]
-    local note = p.note
+	local category = PBL.db.profile.categories[tonumber(p.catIdx)]
+	local reason = PBL.db.profile.reasons[tonumber(p.reaIdx)]
+	local note = p.note
 
 	local blacklistedStr
 	if category ~= "All" and reason ~= "All" then
 		blacklistedStr = string.format("%s (%s) - %s", category, reason, note)
 	elseif category ~= "All" then
 		blacklistedStr = string.format("%s - %s", category, note)
-    elseif reason ~= "All" then
+	elseif reason ~= "All" then
 		blacklistedStr = string.format("%s - %s", reason, note)
 	else
 		blacklistedStr = note
 	end
 
-    return blacklistedStr
+	return blacklistedStr
 end
 
 -- util for adding blacklisted line to tooltip
 local function addBlacklistedStr(tooltip, name)
-    if not name:find("-") then
-        local realm = GetRealmName()
-        realm=realm:gsub(" ", "");
-        name = name .. "-" .. realm;
-    end
-    local banned, idx = isbanned(PBL.db.global.blackList, name)
-    local p = PBL.db.global.blackList[idx];
-    if banned then
-        blacklistedStr = getBlacklistedStr(p)
-        tooltip:AddDoubleLine(WrapTextInColorCode("Blacklisted:", "FFFF0000"), WrapTextInColorCode(blacklistedStr, "FFFFFFFF"));
-    end
+	if not name:find("-") then
+		local realm = GetRealmName()
+		realm=realm:gsub(" ", "");
+		name = name .. "-" .. realm;
+	end
+	local banned, idx = isbanned(PBL.db.global.blackList, name)
+	local p = PBL.db.global.blackList[idx];
+	if banned then
+		blacklistedStr = getBlacklistedStr(p)
+		tooltip:AddDoubleLine(WrapTextInColorCode("Blacklisted:", "FFFF0000"), WrapTextInColorCode(blacklistedStr, "FFFFFFFF"));
+	end
 end
 
 -- util for grabbing object owner
@@ -463,8 +463,8 @@ do
 				unit = mf.unit;
 			end
 		end
-        name = UnitName(unit)
-        addBlacklistedStr(self, name);
+		name = UnitName(unit)
+		addBlacklistedStr(self, name);
 	end);
 
 	GameTooltip:HookScript("OnTooltipCleared", function(self)
@@ -486,7 +486,7 @@ hooksecurefunc(GameTooltip,"SetText",function(self,name)
 		elseif owner_name:find("^QuickJoinFrame%.ScrollBox%.ScrollTarget") then
 			local fullname = name:match(_SOCIAL_QUEUE_COMMUNITIES_HEADER_FORMAT);
 			if fullname then
-                addBlacklistedStr(self, fullname);
+				addBlacklistedStr(self, fullname);
 			end
 		end
 	end
@@ -500,12 +500,12 @@ hooksecurefunc(GameTooltip,"AddLine",function(self,text)
 			-- GroupFinder > SearchResult > Tooltip
 			local leaderName = text:match(_LFG_LIST_TOOLTIP_LEADER);
 			if leaderName then
-                addBlacklistedStr(self, leaderName);
+				addBlacklistedStr(self, leaderName);
 			end
 		elseif owner_name:find("^QuickJoinFrame%.ScrollBox%.ScrollTarget") and owner.entry and owner.entry.guid then
 			local leaderName = text:match(LFG_LIST_TOOLTIP_LEADER:gsub("%%s","(.*)"));
 			if leaderName then
-                addBlacklistedStr(self, leaderName);
+				addBlacklistedStr(self, leaderName);
 			end
 		end
 	end
@@ -515,8 +515,8 @@ end);
 hooksecurefunc("LFGListApplicationViewer_UpdateApplicantMember", function(member, id, index)
 	local name,_,_,_,_,_,_,_,_,_,relationship = C_LFGList.GetApplicantMemberInfo(id, index);
 	if name then
-        local banned, idx = isbanned(PBL.db.global.blackList,name)
-        if banned then
+		local banned, idx = isbanned(PBL.db.global.blackList,name)
+		if banned then
 			member.Name:SetText("|cffFF0000BAN |r"..member.Name:GetText());
 		end
 	end
