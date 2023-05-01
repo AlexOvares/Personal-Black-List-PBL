@@ -385,7 +385,7 @@ function Assignfunchook(dropdownMenu, which, unit, name, userData, ...)
         return
     end
     local info = UIDropDownMenu_CreateInfo()
-    info.text = "Add/Remove to Blacklist"
+    info.text = "Add/Remove to PBL"
     info.owner = which
     info.notCheckable = 1
     info.func = blackListButton
