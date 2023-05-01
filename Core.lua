@@ -14,6 +14,10 @@ local GLDataBroker = LibStub("LibDataBroker-1.1"):NewDataObject("PBL", {
 local icon = LibStub("LibDBIcon-1.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("PBL")
 
+local _FRIENDS_LIST_REALM, _LFG_LIST_TOOLTIP_LEADER = FRIENDS_LIST_REALM.."|r(.+)", gsub(LFG_LIST_TOOLTIP_LEADER,"%%s","(.+)");
+local _SOCIAL_QUEUE_COMMUNITIES_HEADER_FORMAT = SOCIAL_QUEUE_COMMUNITIES_HEADER_FORMAT:gsub("%(","%%("):gsub("%)","%%)"):gsub("%%s","(.*)");
+
+
 local defaults = {
     global = {
         banlist = {},
@@ -385,7 +389,7 @@ function Assignfunchook(dropdownMenu, which, unit, name, userData, ...)
         return
     end
     local info = UIDropDownMenu_CreateInfo()
-    info.text = "Add/Remove to PBL"
+    info.text = "Add/Remove to Blacklist"
     info.owner = which
     info.notCheckable = 1
     info.func = blackListButton
@@ -396,66 +400,137 @@ end
 
 hooksecurefunc("UnitPopup_ShowMenu", Assignfunchook)
 
--- --------------------------------------------------------------------------
--- DEPRECATED: Unit Tooltips
--- --------------------------------------------------------------------------
--- Insert blacklist information into unit tooltips.
--- --------------------------------------------------------------------------
--- GameTooltip:HookScript("OnTooltipSetUnit", function(self)
---     local name, unit = self:GetUnit()
---     if UnitIsPlayer(unit) and not UnitIsUnit(unit, "player") and not UnitIsUnit(unit, "party") then
---         local name, realm = UnitName(unit)
---         if realm == nil then
---             realm=GetRealmName()
---             realm=realm:gsub(" ","");
---         end
---         fullname = name .. "-" .. realm;
 
---         local banned, idx = isbanned(PBL.db.global.blackList,fullname)
---         local p = PBL.db.global.blackList[idx]
---         if banned then
---             local banStr = PBL.db.profile.categories[tonumber(p.catIdx)] .. " (" .. PBL.db.profile.reasons[tonumber(p.reaIdx)] .. ")" .. " - " .. p.note
---             self:AddLine("Blacklisted (PBL): |cffFFFFFF" .. banStr .. "|r", 1, 0, 0, true)
---             self:AddLine(" ")
---             -- self:AddLine(PBL.db.global.blackList[idx].note, 1, 0, 0, true)
---         end
---     end
--- end)
+-- util for generating blacklisted str in format "Category (Reason) - Note"
+local function getBlacklistedStr(p)
+    local category = PBL.db.profile.categories[tonumber(p.catIdx)]
+    local reason = PBL.db.profile.reasons[tonumber(p.reaIdx)]
+    local note = p.note
 
--- --------------------------------------------------------------------------
--- Unit Tooltips
--- --------------------------------------------------------------------------
--- Insert blacklist information into unit tooltips.
--- TODO: Refactor significantly. This is a temporary implementation to match API changes from 10.0.2.
---       Will ned to use TooltipUtil.GetUnit and sub out titles and realm names from the unit name in the table.
--- --------------------------------------------------------------------------
-local function OnTooltipSetUnit(tooltip, data)
+    local blacklistedStr
 
-    -- Temporary bandaid fix pending rewrite to be fully compatible with 10.0.2 tooltip changes.
-    -- API changes mean that tooltip handlers now run on EVERY tooltip instead of native GameTooltips.
-    if tooltip ~= GameTooltip then return end
+    if category ~= "All" then
+        blacklistedStr = category
+    end
 
-    local name, unit = tooltip:GetUnit()
-    if UnitIsPlayer(unit) and not UnitIsUnit(unit, "player") and not UnitIsUnit(unit, "party") then
-        local name, realm = UnitName(unit)
-        if realm == nil then
-            realm=GetRealmName()
-            realm=realm:gsub(" ","");
+    if reason ~= "All" then
+        if blacklistedStr ~= nil then
+            blacklistedStr = blacklistedStr .. " (" .. reason .. ")"
+        else
+            blacklistedStr = reason
         end
-        fullname = name .. "-" .. realm;
+    end
 
-        local banned, idx = isbanned(PBL.db.global.blackList,fullname)
-        local p = PBL.db.global.blackList[idx]
-        if banned then
-            local banStr = PBL.db.profile.categories[tonumber(p.catIdx)] .. " (" .. PBL.db.profile.reasons[tonumber(p.reaIdx)] .. ")" .. " - " .. p.note
-            tooltip:AddLine("Blacklisted (PBL): |cffFFFFFF" .. banStr .. "|r", 1, 0, 0, true)
-            tooltip:AddLine(" ")
-            -- self:AddLine(PBL.db.global.blackList[idx].note, 1, 0, 0, true)
-        end
+    if blacklistedStr ~= nil then
+        blacklistedStr = blacklistedStr .. " - " .. note
+    else
+        blacklistedStr = note
+    end
+
+    return blacklistedStr
+end
+
+
+
+-- util for adding blacklisted line to tooltip
+local function addBlacklistedStr(tooltip, name)
+    if not name:find("-") then
+        local realm = GetRealmName()
+        realm=realm:gsub(" ", "");
+        name = name .. "-" .. realm;
+    end
+    local banned, idx = isbanned(PBL.db.global.blackList, name)
+    local p = PBL.db.global.blackList[idx];
+    if banned then
+        blacklistedStr = getBlacklistedStr(p)
+        tooltip:AddDoubleLine(WrapTextInColorCode("Blacklisted:", "FFFF0000"), WrapTextInColorCode(blacklistedStr, "FFFFFFFF"));
     end
 end
 
-TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, OnTooltipSetUnit)
+-- hook for GameTooltip's PostCall
+do
+	local ttDone = nil;
+	TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, function()
+		if ttDone==true then return end
+		ttDone = true;
+		local self = GameTooltip
+		local name, unit = self:GetUnit();
+		if not unit then
+			local mf = GetMouseFocus();
+			if mf and mf.unit then
+				unit = mf.unit;
+			end
+		end
+        name = UnitName(unit)
+        addBlacklistedStr(self, name);
+	end);
+
+	GameTooltip:HookScript("OnTooltipCleared", function(self)
+		ttDone = nil
+	end)
+end
+
+-- util for grabbing object owner
+local function GetObjOwnerName(self)
+	local owner, owner_name = self:GetOwner();
+	if owner then
+		owner_name = owner:GetName();
+		if not owner_name then
+			owner_name = owner:GetDebugName();
+		end
+	end
+	return owner, owner_name;
+end
+
+-- hook for GameTooltip's SetText
+hooksecurefunc(GameTooltip,"SetText",function(self,name)
+	local owner, owner_name = GetObjOwnerName(self);
+	if owner_name then
+		if owner_name:find("^LFGListFrame%.ApplicationViewer%.ScrollBox%.ScrollTarget%.[a-z0-9]*%.Member[0-9]*") then
+			-- GroupFinder > ApplicantViewer > Tooltip
+			local button = owner:GetParent();
+			if button and button.applicantID and owner.memberIdx then
+				local fullname = C_LFGList.GetApplicantMemberInfo(button.applicantID, owner.memberIdx);
+				addBlacklistedStr(self, fullname);
+			end
+		elseif owner_name:find("^QuickJoinFrame%.ScrollBox%.ScrollTarget") then
+			local fullname = name:match(_SOCIAL_QUEUE_COMMUNITIES_HEADER_FORMAT);
+			if fullname then
+                addBlacklistedStr(self, fullname);
+			end
+		end
+	end
+end);
+
+-- hook for GameTooltip's AddLine 
+hooksecurefunc(GameTooltip,"AddLine",function(self,text)
+	local owner, owner_name = GetObjOwnerName(self);
+	if owner_name then
+		if owner_name:find("^LFGListFrame%.SearchPanel%.ScrollBox%.ScrollTarget%.[a-z0-9]*") then
+			-- GroupFinder > SearchResult > Tooltip
+			local leaderName = text:match(_LFG_LIST_TOOLTIP_LEADER);
+			if leaderName then
+                addBlacklistedStr(self, leaderName);
+			end
+		elseif owner_name:find("^QuickJoinFrame%.ScrollBox%.ScrollTarget") and owner.entry and owner.entry.guid then
+			local leaderName = text:match(LFG_LIST_TOOLTIP_LEADER:gsub("%%s","(.*)"));
+			if leaderName then
+                addBlacklistedStr(self, leaderName);
+			end
+		end
+	end
+end);
+
+-- hook for Groupfinder applicants
+hooksecurefunc("LFGListApplicationViewer_UpdateApplicantMember", function(member, id, index)
+	local name,_,_,_,_,_,_,_,_,_,relationship = C_LFGList.GetApplicantMemberInfo(id, index);
+	if name then
+        local banned, idx = isbanned(PBL.db.global.blackList,name)
+        if banned then
+			member.Name:SetText("|cffFF0000BAN |r"..member.Name:GetText());
+		end
+	end
+end);
 
 -- --------------------------------------------------------------------------
 -- LFG Tooltips
