@@ -427,8 +427,14 @@ hooksecurefunc("UnitPopup_ShowMenu", Assignfunchook)
 -- --------------------------------------------------------------------------
 -- Insert blacklist information into unit tooltips.
 -- TODO: Refactor significantly. This is a temporary implementation to match API changes from 10.0.2.
+--       Will ned to use TooltipUtil.GetUnit and sub out titles and realm names from the unit name in the table.
 -- --------------------------------------------------------------------------
 local function OnTooltipSetUnit(tooltip, data)
+
+    -- Temporary bandaid fix pending rewrite to be fully compatible with 10.0.2 tooltip changes.
+    -- API changes mean that tooltip handlers now run on EVERY tooltip instead of native GameTooltips.
+    if tooltip ~= GameTooltip then return end
+
     local name, unit = tooltip:GetUnit()
     if UnitIsPlayer(unit) and not UnitIsUnit(unit, "player") and not UnitIsUnit(unit, "party") then
         local name, realm = UnitName(unit)
