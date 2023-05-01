@@ -14,10 +14,6 @@ local GLDataBroker = LibStub("LibDataBroker-1.1"):NewDataObject("PBL", {
 local icon = LibStub("LibDBIcon-1.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("PBL")
 
-local _FRIENDS_LIST_REALM, _LFG_LIST_TOOLTIP_LEADER = FRIENDS_LIST_REALM.."|r(.+)", gsub(LFG_LIST_TOOLTIP_LEADER,"%%s","(.+)");
-local _SOCIAL_QUEUE_COMMUNITIES_HEADER_FORMAT = SOCIAL_QUEUE_COMMUNITIES_HEADER_FORMAT:gsub("%(","%%("):gsub("%)","%%)"):gsub("%%s","(.*)");
-
-
 local defaults = {
     global = {
         banlist = {},
