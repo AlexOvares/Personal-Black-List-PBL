@@ -396,6 +396,11 @@ end
 
 hooksecurefunc("UnitPopup_ShowMenu", Assignfunchook)
 
+-- --------------------------------------------------------------------------
+-- Unit Tooltips
+-- --------------------------------------------------------------------------
+-- Insert blacklist information into unit tooltips.
+-- --------------------------------------------------------------------------
 
 -- util for generating blacklisted str in format "Category (Reason) - Note"
 local function getBlacklistedStr(p)
@@ -403,30 +408,19 @@ local function getBlacklistedStr(p)
     local reason = PBL.db.profile.reasons[tonumber(p.reaIdx)]
     local note = p.note
 
-    local blacklistedStr
-
-    if category ~= "All" then
-        blacklistedStr = category
-    end
-
-    if reason ~= "All" then
-        if blacklistedStr ~= nil then
-            blacklistedStr = blacklistedStr .. " (" .. reason .. ")"
-        else
-            blacklistedStr = reason
-        end
-    end
-
-    if blacklistedStr ~= nil then
-        blacklistedStr = blacklistedStr .. " - " .. note
-    else
-        blacklistedStr = note
-    end
+	local blacklistedStr
+	if category ~= "All" and reason ~= "All" then
+		blacklistedStr = string.format("%s (%s) - %s", category, reason, note)
+	elseif category ~= "All" then
+		blacklistedStr = string.format("%s - %s", category, note)
+    elseif reason ~= "All" then
+		blacklistedStr = string.format("%s - %s", reason, note)
+	else
+		blacklistedStr = note
+	end
 
     return blacklistedStr
 end
-
-
 
 -- util for adding blacklisted line to tooltip
 local function addBlacklistedStr(tooltip, name)
@@ -441,6 +435,18 @@ local function addBlacklistedStr(tooltip, name)
         blacklistedStr = getBlacklistedStr(p)
         tooltip:AddDoubleLine(WrapTextInColorCode("Blacklisted:", "FFFF0000"), WrapTextInColorCode(blacklistedStr, "FFFFFFFF"));
     end
+end
+
+-- util for grabbing object owner
+local function GetObjOwnerName(self)
+	local owner, owner_name = self:GetOwner();
+	if owner then
+		owner_name = owner:GetName();
+		if not owner_name then
+			owner_name = owner:GetDebugName();
+		end
+	end
+	return owner, owner_name;
 end
 
 -- hook for GameTooltip's PostCall
@@ -464,18 +470,6 @@ do
 	GameTooltip:HookScript("OnTooltipCleared", function(self)
 		ttDone = nil
 	end)
-end
-
--- util for grabbing object owner
-local function GetObjOwnerName(self)
-	local owner, owner_name = self:GetOwner();
-	if owner then
-		owner_name = owner:GetName();
-		if not owner_name then
-			owner_name = owner:GetDebugName();
-		end
-	end
-	return owner, owner_name;
 end
 
 -- hook for GameTooltip's SetText
