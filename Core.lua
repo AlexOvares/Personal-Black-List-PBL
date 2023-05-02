@@ -484,6 +484,7 @@ hooksecurefunc(GameTooltip,"SetText",function(self,name)
 				addBlacklistedStr(self, fullname);
 			end
 		elseif owner_name:find("^QuickJoinFrame%.ScrollBox%.ScrollTarget") then
+            local _SOCIAL_QUEUE_COMMUNITIES_HEADER_FORMAT = SOCIAL_QUEUE_COMMUNITIES_HEADER_FORMAT:gsub("%(","%%("):gsub("%)","%%)"):gsub("%%s","(.*)");
 			local fullname = name:match(_SOCIAL_QUEUE_COMMUNITIES_HEADER_FORMAT);
 			if fullname then
 				addBlacklistedStr(self, fullname);
@@ -494,21 +495,24 @@ end);
 
 -- hook for GameTooltip's AddLine 
 hooksecurefunc(GameTooltip,"AddLine",function(self,text)
-	local owner, owner_name = GetObjOwnerName(self);
-	if owner_name then
-		if owner_name:find("^LFGListFrame%.SearchPanel%.ScrollBox%.ScrollTarget%.[a-z0-9]*") then
-			-- GroupFinder > SearchResult > Tooltip
-			local leaderName = text:match(_LFG_LIST_TOOLTIP_LEADER);
-			if leaderName then
-				addBlacklistedStr(self, leaderName);
+    if text ~= nil then
+		local owner, owner_name = GetObjOwnerName(self);
+		if owner_name then
+			if owner_name:find("^LFGListFrame%.SearchPanel%.ScrollBox%.ScrollTarget%.[a-z0-9]*") then
+				-- GroupFinder > SearchResult > Tooltip
+				local _LFG_LIST_TOOLTIP_LEADER = gsub(LFG_LIST_TOOLTIP_LEADER,"%%s","(.+)");
+				local leaderName = text:match(_LFG_LIST_TOOLTIP_LEADER);
+				if leaderName then
+					addBlacklistedStr(self, leaderName);
+				end
+			elseif owner_name:find("^QuickJoinFrame%.ScrollBox%.ScrollTarget") and owner.entry and owner.entry.guid then
+				local leaderName = text:match(LFG_LIST_TOOLTIP_LEADER:gsub("%%s","(.*)"));
+				if leaderName then
+					addBlacklistedStr(self, leaderName);
+				end
 			end
-		elseif owner_name:find("^QuickJoinFrame%.ScrollBox%.ScrollTarget") and owner.entry and owner.entry.guid then
-			local leaderName = text:match(LFG_LIST_TOOLTIP_LEADER:gsub("%%s","(.*)"));
-			if leaderName then
-				addBlacklistedStr(self, leaderName);
-			end
-		end
-	end
+		end     
+    end
 end);
 
 -- hook for Groupfinder applicants
