@@ -2,7 +2,7 @@ PBL = LibStub("AceAddon-3.0"):NewAddon("Personal Black List", "AceConsole-3.0", 
 local GLDataBroker = LibStub("LibDataBroker-1.1"):NewDataObject("PBL", {
     type = "data source",
     text = "PBL",
-    icon = "Interface\\AddOns\\PersonalBlacklist\\media\\___newIcon.blp",
+    icon = "Interface\\AddOns\\PersonalBlacklist\\media\\icon.blp",
     OnTooltipShow = function(tooltip)
           tooltip:SetText("Personal Blacklist")
           tooltip:AddLine("Ban List", 1, 1, 1)
@@ -123,6 +123,12 @@ function PBL:OnInitialize()
         end
         PBL.db.global.banlist = {}
     end
+end
+
+-- Register Addon Compartment (10.1.0 Feature)
+
+function PBL_OnAddonCompartmentClick(addonName, buttonName)
+    PBL:showFrame()
 end
 
 -- --------------------------------------------------------------------------
