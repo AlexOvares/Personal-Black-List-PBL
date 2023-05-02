@@ -423,6 +423,7 @@ function PBL:showFrame()
                         {["name"] = "<Paradøx> (Ragnaros-US)", ["role"] = "Tester"},
                         {["name"] = "<Incarnate> (Ragnaros-US)", ["role"] = "Tester"},
                         {["name"] = "<Born To Wipe> (Quel'Thalas-US)", ["role"] = "Tester"},
+                        {["name"] = "swirl @ PBL Discord", ["role"] = "Refactored LFG Support"}
 					},
 				}
 
