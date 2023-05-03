@@ -459,16 +459,20 @@ end
 do
 	local ttDone = nil;
 	TooltipDataProcessor.AddTooltipPostCall(Enum.TooltipDataType.Unit, function()
+        -- TODO: Name is assigned twice here but both return the same (466 + 477) - why?
 		if ttDone==true then return end
 		ttDone = true;
 		local self = GameTooltip
 		local name, unit = self:GetUnit();
+        -- Explicit check for unit type to prevent unnecessary calls from non-players.
+        if not UnitIsPlayer(unit) then return end
 		if not unit then
 			local mf = GetMouseFocus();
 			if mf and mf.unit then
 				unit = mf.unit;
 			end
 		end
+
 		name = UnitName(unit)
 		addBlacklistedStr(self, name);
 	end);
