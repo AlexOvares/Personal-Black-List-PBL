@@ -54,7 +54,6 @@ To remove a player from your blacklist, you can either:
 - [@Xylons](https://github.com/AlexOvares/) - Addon Author
 - [@Heomel](https://www.curseforge.com/members/heomel) - Contributor
 - [@Ayr](https://github.com/Scryrz) - Contributor
-- [@Chamilo025](https://www.curseforge.com/members/chamilo025) - Translator
 - [@CheersItsJulian](https://www.curseforge.com/members/cheersitsjulian) - Translator
 
 
